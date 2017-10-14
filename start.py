@@ -11,17 +11,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import yaml
+
 from clusterdock.models import Cluster, Node
+
+logger = logging.getLogger('clusterdock.{}'.format(__name__))
 
 DEFAULT_NAMESPACE = 'clusterdock'
 DEFAULT_OPERATING_SYSTEM = 'centos6.6'
 
 
 def main(args):
+    if args.node_disks:
+        node_disks = yaml.load(args.node_disks)
+        logger.debug(node_disks)
+
     image = '{}/{}/topology_nodebase:{}'.format(args.registry,
                                                 args.namespace or DEFAULT_NAMESPACE,
                                                 args.operating_system or DEFAULT_OPERATING_SYSTEM)
 
-    cluster = Cluster(*[Node(hostname=hostname, group='nodes', image=image)
+    cluster = Cluster(*[Node(hostname=hostname, group='nodes', image=image,
+                             devices=node_disks.get(hostname) if args.node_disks else [])
                         for hostname in args.nodes])
     cluster.start(args.network)
