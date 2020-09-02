@@ -10,7 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM centos:7.4.1708
+ARG BASE_IMAGE=centos:7.8.2003
+FROM ${BASE_IMAGE}
 ENV container docker
 
 # Delete a number of unit files which might cause issues.
